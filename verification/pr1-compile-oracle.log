@@ -1,0 +1,16 @@
+=== Mathlib/Combinatorics/Enumerative/PlaneTree.lean ===
+compile: lake env lean Mathlib/Combinatorics/Enumerative/PlaneTree.lean
+exit: 0 (no errors, no warnings)
+
+=== axiom oracle (lake env lean, importing the module) ===
+'PlaneTree.card_treesOfNumNodesEq_succ' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PlaneTree.mem_treesOfNumNodesEq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PlaneTree.card_forestsOfNumNodesEq' depends on axioms: [propext, Classical.choice, Quot.sound]
+
+=== numeric test ===
+example : (PlaneTree.treesOfNumNodesEq 3).card = 2 := by
+  rw [PlaneTree.card_treesOfNumNodesEq_succ, catalan_two]
+-- exit 0
+
+Toolchain: leanprover/lean4:v4.29.0-rc6 (current Mathlib master toolchain)
+Mathlib snapshot: 07642720480157414db592fa85b626dafb71355b
