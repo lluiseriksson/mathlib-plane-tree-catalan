@@ -73,9 +73,8 @@ jobs:
         working-directory: mathlib4
         run: |
           set -o pipefail
-          lake exe mk_all 2>&1 | tee ../artifact/pr1-replay-build.log
           lake build Mathlib.Combinatorics.Enumerative.PlaneTree \
-            2>&1 | tee -a ../artifact/pr1-replay-build.log
+            2>&1 | tee ../artifact/pr1-replay-build.log
 
       - name: Inspect theorem axioms and numeric check
         working-directory: mathlib4
