@@ -1,0 +1,596 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1.1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{microtype}
+\emergencystretch=1.5em
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+
+\lstdefinelanguage{lean}{
+  keywords={theorem,def,noncomputable,by,fun,match,with,open,import,namespace,end},
+  sensitive=true,
+  comment=[l]{--},
+  morecomment=[s]{/-}{-/},
+}
+\lstset{
+  language=lean,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\bfseries,
+  commentstyle=\itshape\color{gray},
+  columns=fullflexible,
+  keepspaces=true,
+  breaklines=true,
+  literate={∑}{{$\textstyle\sum$}}1
+           {∏}{{$\textstyle\prod$}}1
+           {∈}{{$\in$}}1
+           {⊤}{{$\top$}}1
+           {ℕ}{{$\mathbb{N}$}}1
+           {ℝ}{{$\mathbb{R}$}}1
+           {⁻¹}{{$^{-1}$}}2
+           {→}{{$\to$}}1
+           {↔}{{$\leftrightarrow$}}1
+           {∀}{{$\forall$}}1
+           {≠}{{$\neq$}}1,
+}
+
+\title{A Machine-Verified Bijective Proof of the Rooted\\
+Child-Factorial Catalan Identity over Spanning Trees\\
+of the Complete Graph}
+\author{Lluis Eriksson}
+\date{July 2, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Let $K_{n+1}$ be the complete graph on the vertex set $\{0,1,\dots,n\}$, and
+for a spanning tree $T$ of $K_{n+1}$, rooted at $0$, let $c_T(v)$ denote the
+number of children of the vertex $v$.  We prove the exact identity
+\[
+  \sum_{T \in \mathrm{ST}(K_{n+1})} \; \prod_{v=0}^{n} c_T(v)! \;=\; n!\,C_n ,
+\]
+where $C_n$ is the $n$-th Catalan number; equivalently, the normalized sum
+$(n+1)\,\bigl((n+1)!\bigr)^{-1}\sum_T \prod_v c_T(v)!$ equals $C_n$ exactly.
+The proof is bijective: pairs consisting of a spanning tree together with a
+linear ordering of every child set are placed in explicit bijection with
+vertex-labeled plane trees on $n+1$ nodes whose root carries the label $0$.
+The identity arises as the exact ``second-Ursell'' normalization constant in
+the author's audit-first programme on four-dimensional $SU(N)$ Yang--Mills
+existence and mass gap, where it had been isolated as a named open proposition
+in a public challenge repository; the present paper is self-contained
+combinatorics and makes no claim about that programme.  The entire proof has
+been formalized in Lean~4 against a pinned Mathlib snapshot: the headline
+declarations compile with no \texttt{sorry}, and the kernel's axiom oracle
+reports exactly \texttt{[propext, Classical.choice, Quot.sound]}.  All
+artifacts, including a pinned continuous-integration replay of the full
+verification, are public.
+\end{abstract}
+
+\section{Introduction}\label{sec:intro}
+
+Cluster and tree-graph expansions bound logarithms of partition functions by
+sums over trees; this line of reasoning goes back to Penrose's tree-graph
+identity~\cite{Penrose1967} and was given its modern abstract-polymer form by
+Koteck\'y and Preiss~\cite{KoteckyPreiss1986}.  In quantitative applications
+one repeatedly meets weighted sums over the spanning trees of a complete
+graph, where the weight of a tree is a product of local factors attached to
+its vertices.  The simplest nontrivial member of this family assigns to a
+rooted spanning tree the product of the factorials of its child counts.
+
+In the author's programme on the construction of four-dimensional $SU(N)$
+Yang--Mills theory~\cite{Eriksson2026Master,Eriksson2026KP}, the terminal
+Koteck\'y--Preiss estimate requires the \emph{exact} evaluation of this
+factorially weighted spanning-tree sum: the ``second-Ursell'' normalization
+constant of the expansion is precisely the ratio of the weighted sum to
+$(n+1)!/(n+1) = n!$, and convergence at the stated radius needs this ratio to
+be the Catalan number $C_n$ on the nose, not merely of Catalan order.  The
+statement was therefore isolated, under the name
+\texttt{RootedChildFactorialCatalanIdentity}, as an explicitly open
+proposition in a public challenge repository, with the request that it be
+closed by an unconditional, machine-checked proof against the repository's own
+definitions.
+
+This paper does three things.
+\begin{enumerate}
+  \item It states and proves the identity
+    (Theorem~\ref{thm:main}) by an explicit bijection between pairs
+    \emph{(spanning tree, orderings of all child sets)} and vertex-labeled
+    plane trees with root label $0$ (Section~\ref{sec:bijection}), combined
+    with the enumeration of the latter objects
+    (Section~\ref{sec:counting}).
+  \item It reports a complete formalization of the proof in
+    Lean~4~\cite{Lean4} over the Mathlib library~\cite{mathlib}, carried out
+    against the pinned toolchain of the challenge repository and checked by
+    the Lean kernel with a clean axiom footprint
+    (Section~\ref{sec:lean}).
+  \item It documents the reproducibility artifacts: the repository, the
+    pull request closing the challenge, the exact commit, and a pinned
+    continuous-integration replay of the entire verification
+    (Section~\ref{sec:repro}).
+\end{enumerate}
+The mathematics below is entirely self-contained and elementary; no result
+from, and no claim about, the Yang--Mills programme is used or made.
+
+\section{Statement and numerical audit}\label{sec:statement}
+
+Fix $n \ge 1$ and let $V = \{0,1,\dots,n\}$, so that $|V| = n+1$.  We write
+$\mathrm{ST}(K_{n+1})$ for the set of spanning trees of the complete graph on
+$V$, encoded as sets of unordered edges.  Every spanning tree $T$ is rooted at
+the distinguished vertex $0$: each $w \neq 0$ has a unique neighbor lying on
+the path from $w$ to $0$, its \emph{parent} $p_T(w)$, and
+\[
+  \mathrm{ch}_T(v) \;=\; \{\, w \neq 0 : p_T(w) = v \,\}, \qquad
+  c_T(v) \;=\; |\mathrm{ch}_T(v)|
+\]
+are the \emph{children} and the \emph{child count} of $v$.  (In the
+formalization the parent is defined for an arbitrary edge set as the minimal
+neighbor one breadth-first-search level closer to the root; for a tree this
+minimum is over a singleton and coincides with the graph-theoretic parent.
+All statements below are proved against that general definition.)
+
+Let $C_n = \frac{1}{n+1}\binom{2n}{n}$ denote the Catalan numbers, so
+$C_1, C_2, C_3, \dots = 1, 2, 5, 14, 42, 132, \dots$
+
+\begin{theorem}[rooted child-factorial Catalan identity]\label{thm:main}
+For every $n \ge 1$,
+\[
+  \sum_{T \in \mathrm{ST}(K_{n+1})} \; \prod_{v \in V} c_T(v)!
+  \;=\; n! \, C_n .
+\]
+\end{theorem}
+
+\begin{corollary}[normalized form]\label{cor:normalized}
+For every $n \ge 1$,
+\[
+  (n+1)\,\bigl((n+1)!\bigr)^{-1}
+  \sum_{T \in \mathrm{ST}(K_{n+1})} \; \prod_{v \in V} c_T(v)!
+  \;=\; C_n
+\]
+as an identity of real numbers.  This is the form
+\emph{\texttt{RootedChildFactorialCatalanIdentity}} of the challenge
+repository.
+\end{corollary}
+
+\begin{remark}
+The unweighted analogue of the left-hand side is Cayley's formula
+$|\mathrm{ST}(K_{n+1})| = (n+1)^{n-1}$~\cite{Cayley1889}.  Since every weight
+$\prod_v c_T(v)!$ is a positive integer, Theorem~\ref{thm:main} in particular
+interpolates between the two classical sequences: for $n = 4$, for instance,
+the $125$ spanning trees of $K_5$ carry total weight $336 = 4! \cdot 14$.
+\end{remark}
+
+Before turning to the proof we record a brute-force audit.  Enumerating all
+spanning trees of $K_{n+1}$ through Pr\"ufer sequences and computing the
+weighted sum directly gives the following table, in exact agreement with
+Theorem~\ref{thm:main}.
+
+\begin{center}
+\begin{tabular}{rrrr}
+\toprule
+$n$ & $|\mathrm{ST}(K_{n+1})| = (n+1)^{n-1}$ &
+$\sum_T \prod_v c_T(v)!$ & $n!\,C_n$ \\
+\midrule
+1 & 1 & 1 & 1 \\
+2 & 3 & 4 & 4 \\
+3 & 16 & 30 & 30 \\
+4 & 125 & 336 & 336 \\
+5 & 1296 & 5040 & 5040 \\
+6 & 16807 & 95040 & 95040 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{The bijection}\label{sec:bijection}
+
+The left-hand side of Theorem~\ref{thm:main} counts, with multiplicity, the
+pairs
+\[
+  (T, L), \qquad T \in \mathrm{ST}(K_{n+1}), \quad
+  L = (\ell_v)_{v \in V},
+\]
+where $\ell_v$ is a duplicate-free list enumerating the child set
+$\mathrm{ch}_T(v)$; for fixed $T$ there are exactly $\prod_v c_T(v)!$ such
+\emph{child listings}.  We call the pairs $(T,L)$ \emph{ordered rooted
+spanning trees}.
+
+The right-hand side counts \emph{labeled plane trees}.  A plane tree (rose
+tree) with labels in $V$ is either a node carrying a label $a \in V$ together
+with a finite \emph{ordered} list of labeled plane subtrees.  Write
+$\mathrm{lab}(u)$ for the list of labels of $u$ in root-first order, and let
+\[
+  \mathcal{L}_n \;=\; \{\, u :
+    \mathrm{lab}(u) \text{ is a permutation of } (0,1,\dots,n)
+    \text{ and the root label of } u \text{ is } 0 \,\}.
+\]
+Section~\ref{sec:counting} shows $|\mathcal{L}_n| = n!\,C_n$.
+Theorem~\ref{thm:main} therefore follows from:
+
+\begin{theorem}[bijection]\label{thm:bij}
+The map
+\[
+  \Phi : (T, L) \;\longmapsto\; \Phi_{T,L}(0),
+\]
+where $\Phi_{T,L}(v)$ is the labeled plane tree with root label $v$ whose
+ordered subtrees are $\Phi_{T,L}(w)$ for $w$ running through $\ell_v$ in list
+order, is a bijection from the set of ordered rooted spanning trees onto
+$\mathcal{L}_n$.
+\end{theorem}
+
+The recursion defining $\Phi_{T,L}$ is well founded because a child sits one
+breadth-first-search level below its parent, so the quantity
+$(n+1) - \mathrm{level}_T(v)$ strictly decreases along the recursion.  The
+proof of Theorem~\ref{thm:bij} splits into the three usual claims, whose
+formalized statements are quoted in Section~\ref{sec:lean}.
+
+\subsection{Well-definedness}
+
+\begin{proposition}\label{prop:welldef}
+For every ordered rooted spanning tree $(T,L)$ one has
+$\Phi_{T,L}(0) \in \mathcal{L}_n$.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+The label multiset of the subtree $\Phi_{T,L}(v)$ is characterized by parent
+iterates:
+\[
+  w \in \mathrm{lab}\bigl(\Phi_{T,L}(v)\bigr)
+  \iff
+  \exists k \ge 0 : \; p_T^{\,k}(w) = v
+  \text{ and } \mathrm{level}_T(w) = \mathrm{level}_T(v) + k .
+\]
+(The proof is by the same well-founded recursion as the definition of
+$\Phi$.)  Two consequences follow.  First, subtrees rooted at distinct
+children of the same node have disjoint label sets: a common label $w$ would
+have the two children as parent iterates at the \emph{same} offset
+$k = \mathrm{level}(w) - \mathrm{level}(\text{child})$, hence the children
+would coincide.  This makes $\mathrm{lab}(\Phi_{T,L}(v))$ duplicate-free, by
+induction.  Second, at $v = 0$ every vertex $w$ occurs, with
+$k = \mathrm{level}_T(w)$, because iterating the parent map from $w$ reaches
+the root in exactly $\mathrm{level}_T(w)$ steps.  A duplicate-free list of
+$n+1$ elements of $V$ is a permutation of $(0,\dots,n)$, and the root label of
+$\Phi_{T,L}(0)$ is $0$ by construction.
+\end{proof}
+
+\subsection{Injectivity}
+
+For a labeled plane tree $u$ with duplicate-free labels and $v \in
+\mathrm{lab}(u)$, let $\mathrm{childrenOf}(u,v)$ denote the list of root
+labels of the ordered subtrees of the unique node of $u$ labeled $v$.
+
+\begin{proposition}\label{prop:inj}
+$\Phi$ is injective.  More precisely, if $u = \Phi_{T,L}(0)$ then
+$\ell_v = \mathrm{childrenOf}(u,v)$ for every $v$, and $T$ is recovered as the
+set of parent edges $\{\{v, w\} : w \in \ell_v\}$.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+The extraction $\ell_v = \mathrm{childrenOf}(u,v)$ is proved by the same
+well-founded recursion, using the pairwise disjointness of sibling label sets
+to show that the search for the node labeled $v$ descends into the correct
+subtree.  Thus $L$ is determined by $u$.  Next, the listings determine the
+parent map ($w \in \ell_v$ forces $p_T(w) = v$), and a spanning tree is
+determined by its parent map: its edge set \emph{equals} its set of parent
+edges.  The latter recovery statement is a lemma of the upstream artifact (in
+the terminology of the repository, $\mathrm{penroseTree}(T) = T$ for every
+spanning tree $T$), and injectivity follows.
+\end{proof}
+
+\subsection{Surjectivity}
+
+\begin{proposition}\label{prop:surj}
+$\Phi$ is surjective onto $\mathcal{L}_n$.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+Given $u \in \mathcal{L}_n$, define
+\[
+  T_u = \bigl\{ \{v, w\} : w \in \mathrm{childrenOf}(u,v) \bigr\},
+  \qquad
+  L_u = \bigl(\mathrm{childrenOf}(u,v)\bigr)_{v \in V}.
+\]
+Three facts are needed.
+
+\emph{(a) $T_u$ is a spanning tree.}  Connectivity: by structural induction
+on $u$, every label reaches the root label along parent--child edges.  Edge
+count: the edges of $T_u$ are in bijection with the disjoint union
+$\bigsqcup_v \mathrm{childrenOf}(u,v)$ (distinct parents contribute distinct
+edges, by antisymmetry of the structural parent--child relation on a
+duplicate-free tree), and that disjoint union is in bijection with the set of
+non-root labels (every non-root label has a structural parent, and the parent
+is unique).  Hence $|T_u| = n$, and a connected graph on $n+1$ vertices with
+$n$ edges is a tree.
+
+\emph{(b) The rooted children of $T_u$ are the structural children:}
+$\mathrm{ch}_{T_u}(v) = \mathrm{childrenOf}(u,v)$ as sets.  The key claim is
+that for every $w \neq 0$,
+\[
+  w \in \mathrm{childrenOf}\bigl(u,\, p_{T_u}(w)\bigr),
+\]
+proved by strong induction on the breadth-first-search level of $w$ in $T_u$.
+Indeed $p_{T_u}(w)$ is adjacent to $w$, and adjacency in $T_u$ means exactly
+``structural parent or structural child''.  If $b := p_{T_u}(w)$ were a
+structural \emph{child} of $w$, then $b \neq 0$ (the root label $0$ is never a
+child), the inductive hypothesis applies to $b$ (its level is smaller by the
+parent equation), and by uniqueness of structural parents $p_{T_u}(b) = w$.
+The two level equations
+$\mathrm{level}(b) + 1 = \mathrm{level}(w)$ and
+$\mathrm{level}(w) + 1 = \mathrm{level}(b)$
+then contradict each other.  Notably, this argument needs neither a depth
+function on $u$ nor an explicit parent function: the two instances of the
+parent specification collide by themselves.
+
+\emph{(c) Reconstruction:} $\Phi_{T_u, L_u}(0) = u$.  This is an instance of
+the general lemma that $\Phi_{T,L}(\mathrm{root}(u)) = u$ whenever the
+listings $L$ agree with $\mathrm{childrenOf}(u,\cdot)$ on the labels of $u$
+--- proved by structural induction on $u$, the agreement hypothesis
+propagating to each subtree because $\mathrm{childrenOf}$ restricted to the
+labels of a subtree coincides with the subtree's own $\mathrm{childrenOf}$.
+For $(T_u, L_u)$ the agreement holds by definition ($L_u$ \emph{is}
+$\mathrm{childrenOf}(u,\cdot)$), and $\mathrm{root}(u) = 0$.
+\end{proof}
+
+\section{Counting labeled plane trees}\label{sec:counting}
+
+\begin{proposition}\label{prop:count}
+$|\mathcal{L}_n| = n! \, C_n$ for every $n \ge 1$.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+Unlabeled plane trees with $m+1$ nodes are counted by $C_m$: deleting the
+root's first subtree decomposes a plane tree with $m+1$ nodes into an ordered
+pair of strictly smaller plane trees, which yields the recurrence
+$P_{m+1} = \sum_{i+j = m} P_i\,P_j$ with $P_0 = 1$ (nodes counted so that
+$P_m$ is the number of plane trees with $m+1$ nodes), i.e.\ exactly the
+defining recurrence of the Catalan numbers, as implemented in Mathlib's
+\texttt{Combinatorics.Enumerative.Catalan}.  A labeled plane tree in
+$\mathcal{L}_n$ is equivalently a pair (shape, labeling): writing the labels
+in root-first order identifies the labelings of a fixed shape with the
+permutations of $(0,\dots,n)$ whose first entry is $0$, of which there are
+$n!$, and the pair (shape, label word) determines the labeled tree uniquely
+(rigidity of the decoration).  Hence
+$|\mathcal{L}_n| = n! \cdot C_n$.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:main} and
+Corollary~\ref{cor:normalized}]
+By Theorem~\ref{thm:bij} and Proposition~\ref{prop:count},
+\[
+  \sum_{T} \prod_v c_T(v)!
+  \;=\; \#\{(T,L)\}
+  \;=\; |\mathcal{L}_n|
+  \;=\; n!\,C_n .
+\]
+For the corollary, multiply by $(n+1)\bigl((n+1)!\bigr)^{-1} = (n!)^{-1}$ and
+cancel: $(n+1)\,\bigl((n+1)!\bigr)^{-1}\, n!\, C_n = C_n$, using
+$(n+1)! = (n+1)\,n!$ and $n! \neq 0$.
+\end{proof}
+
+\section{The Lean formalization}\label{sec:lean}
+
+Every statement above has been formalized in Lean~4~\cite{Lean4} over
+Mathlib~\cite{mathlib}, against the challenge repository's pinned toolchain
+(Lean \texttt{leanprover/lean4:v4.29.0-rc6}, Mathlib commit
+\texttt{07642720480157414db592fa85b626dafb71355b}) and against the
+repository's \emph{own} definitions of spanning trees, breadth-first-search
+parents, and rooted child counts.  The headline declarations are:
+
+\begin{lstlisting}
+theorem sum_prod_rootedChildCount_factorial_eq (n : ℕ) :
+    (∑ T ∈ spanningTrees (⊤ : SimpleGraph (Fin (n + 1))),
+        ∏ v, (rootedChildCount T v)!) = n ! * catalan n
+
+theorem rootedChildFactorialCatalanIdentity_holds (n : ℕ) :
+    RootedChildFactorialCatalanIdentity n
+\end{lstlisting}
+
+\noindent
+where the second statement unfolds, per the repository's definitions, to the
+real-number identity of Corollary~\ref{cor:normalized}:
+
+\begin{lstlisting}
+noncomputable def rootedChildFactorialTreeSum (n : ℕ) : ℝ :=
+  ∑ T ∈ spanningTrees (⊤ : SimpleGraph (Fin (n + 1))),
+    ∏ v : Fin (n + 1), ((rootedChildCount T v).factorial : ℝ)
+
+noncomputable def rootedChildFactorialTreeSumNormalized (n : ℕ) : ℝ :=
+  ((n : ℝ) + 1) * (((n + 1).factorial : ℝ))⁻¹ *
+    rootedChildFactorialTreeSum n
+\end{lstlisting}
+
+The proof development comprises five modules
+(about $2{,}200$ lines in total):
+
+\begin{center}
+\begin{tabular}{lrl}
+\toprule
+Module & Lines & Role \\
+\midrule
+\texttt{RootedCatalanWord} & 234 &
+  word-side algebra; normalized-form arithmetic \\
+\texttt{PlaneTreeCatalan} & 214 &
+  plane trees with $m+1$ nodes are counted by $C_m$ \\
+\texttt{LabeledPlaneTreeCatalan} & 382 &
+  decoration rigidity; $|\mathcal{L}_n| = n!\,C_n$ \\
+\texttt{RootedCatalanBridge} & 1288 &
+  the bijection: Props.~\ref{prop:welldef}--\ref{prop:surj},
+  Thm.~\ref{thm:bij}, Thm.~\ref{thm:main} \\
+\texttt{RootedCatalanIdentityProof} & 61 &
+  Corollary~\ref{cor:normalized} against the repository's definitions \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+A few engineering points may be of independent interest to formalizers.
+
+\begin{itemize}
+  \item \emph{Well-founded tree building.}  The map $\Phi$ is defined by
+    well-founded recursion on $(n+1) - \mathrm{level}_T(v)$; the label
+    characterization of Proposition~\ref{prop:welldef} and the extraction of
+    Proposition~\ref{prop:inj} are proved by the same measure.
+  \item \emph{Nested induction on rose trees.}  Labeled plane trees are a
+    nested inductive type (a node carries a \emph{list} of subtrees).  All
+    structural lemmas --- uniqueness and existence of structural parents,
+    antisymmetry of the parent--child relation, duplicate-freeness of child
+    listings, reachability of the root --- are proved by recursion on
+    \texttt{sizeOf}, descending into list members via
+    \texttt{List.sizeOf\_lt\_of\_mem}.
+  \item \emph{The level-clash argument.}  Step (b) of
+    Proposition~\ref{prop:surj} is formalized exactly as sketched: a strong
+    induction on the breadth-first-search level in which the ``bad'' branch is
+    refuted by instantiating the parent specification twice and letting the
+    two resulting level equations contradict each other by linear arithmetic.
+    No depth function on the plane tree is ever introduced.
+  \item \emph{Counting by double disjoint union.}  The edge count
+    $|T_u| = n$ is two applications of
+    \texttt{Finset.card\_biUnion}: edges $\leftrightarrow$ child slots
+    $\leftrightarrow$ non-root labels, with the required disjointness supplied
+    by antisymmetry and by uniqueness of parents, respectively.
+  \item \emph{Axiom footprint.}  The development contains no \texttt{sorry}
+    and no additional axioms; for every exported declaration, including both
+    headline theorems, \texttt{\#print axioms} reports exactly
+\begin{verbatim}
+[propext, Classical.choice, Quot.sound]
+\end{verbatim}
+    i.e.\ the standard classical axioms of Mathlib.
+\end{itemize}
+
+\section{Reproducibility and artifacts}\label{sec:repro}
+
+All artifacts are public in the challenge repository
+\begin{center}
+\url{https://github.com/lluiseriksson/rooted-tree-catalan-closure}
+\end{center}
+The closure is submitted as pull request \#5 (branch
+\texttt{codex/catalan-rigidity-lean-modules}, head commit
+\texttt{1eff8fc651ed3338800b8ff67471e6091ce8ef33}), which adds the five proof
+modules under \texttt{lean-patch/YangMills/KP/}, updates the theorem manifest
+and claim-boundary documents, and archives the verification logs.
+
+The verification is replayed from scratch by a pinned GitHub Actions
+workflow; the run
+\begin{center}
+\url{https://github.com/lluiseriksson/rooted-tree-catalan-closure/actions/runs/28610948452}
+\end{center}
+(i) checks out the pinned upstream artifact and Mathlib snapshot,
+(ii) applies the documented import-narrowing patch --- which leaves every
+upstream proof body byte-identical and only trims module import blocks so the
+relevant dependency chain builds in isolation ---
+(iii) compiles the upstream adapter chain and the five new modules,
+(iv) runs the axiom-oracle checks and prints \texttt{\#print axioms} for the
+closing declarations, and
+(v) validates the resulting logs against the archived evidence with the
+repository's replay validators.
+The archived logs are
+\texttt{catalan-bridge-modules-replay.log},
+\texttt{catalan-bridge-full-compile.log}, and
+\texttt{catalan-identity-proof-oracle.log} under
+\texttt{lean-patch/verification/}.
+
+Independently of Lean, the brute-force audit of
+Section~\ref{sec:statement} (a $30$-line Python script enumerating spanning
+trees via Pr\"ufer sequences) confirms the identity for $1 \le n \le 6$.
+
+\section{Related work and outlook}\label{sec:related}
+
+The identity sits at the intersection of two classical themes.  On the
+enumerative side, plane trees and their labelings belong to the standard
+Catalan circle of ideas~\cite{Stanley2015}; the specific weighted sum over
+spanning trees of $K_{n+1}$, with weight $\prod_v c_T(v)!$, appears to be less
+standard, and we are not aware of a prior published bijective treatment,
+although the result itself is elementary once the correct bijection is
+identified.  On the analytic side, factorially weighted tree sums are the
+combinatorial core of tree-graph and cluster
+expansions~\cite{Penrose1967,KoteckyPreiss1986}; within the author's
+programme, Theorem~\ref{thm:main} supplies the exact constant needed by the
+terminal Koteck\'y--Preiss bound~\cite{Eriksson2026KP}, and the machine-checked
+closure documented here continues the programme's mechanical-audit
+methodology~\cite{Eriksson2026Audit}.
+
+Two natural directions remain.  First, the same bijection should evaluate
+refinements of the sum, e.g.\ with weights $\prod_v x_{c_T(v)}$ for formal
+variables $x_k$, connecting to the exponential-generating-function calculus of
+rooted labeled trees.  Second, on the formal side, the bridge module develops
+a small reusable theory of labeled rose trees (structural parents, listings,
+extraction, reconstruction) that may be worth contributing to Mathlib in
+generic form.
+
+\subsection*{Acknowledgments}
+The Lean formalization was developed interactively with Anthropic's Claude;
+every theorem stated here was checked by the Lean~4 kernel against the pinned
+Mathlib snapshot, with the axiom oracle output archived in the repository.
+
+\begin{thebibliography}{99}
+
+\bibitem{Cayley1889}
+A.~Cayley,
+\emph{A theorem on trees},
+Quart.\ J.\ Pure Appl.\ Math.\ \textbf{23} (1889), 376--378.
+
+\bibitem{Penrose1967}
+O.~Penrose,
+\emph{Convergence of fugacity expansions for classical systems},
+in: T.~A.~Bak (ed.), \emph{Statistical Mechanics: Foundations and
+Applications}, Benjamin, New York, 1967, 101--109.
+
+\bibitem{KoteckyPreiss1986}
+R.~Koteck\'y and D.~Preiss,
+\emph{Cluster expansion for abstract polymer models},
+Comm.\ Math.\ Phys.\ \textbf{103} (1986), 491--498.
+
+\bibitem{Stanley2015}
+R.~P.~Stanley,
+\emph{Catalan Numbers},
+Cambridge University Press, 2015.
+
+\bibitem{Lean4}
+L.~de~Moura and S.~Ullrich,
+\emph{The Lean 4 theorem prover and programming language},
+in: Automated Deduction -- CADE 28, Lecture Notes in Computer Science
+12699, Springer, 2021, 625--635.
+
+\bibitem{mathlib}
+The mathlib Community,
+\emph{The Lean mathematical library},
+in: Proceedings of the 9th ACM SIGPLAN International Conference on Certified
+Programs and Proofs (CPP 2020), ACM, 2020, 367--381.
+
+\bibitem{Eriksson2026Master}
+L.~Eriksson,
+\emph{The Master Map: An Audit-First, Attack-Resistant Navigation Guide to the
+Unconditional Solution of the 4D $SU(N)$ Yang--Mills Existence and Mass Gap
+Problem},
+ai.viXra:2602.0096, 2026.
+
+\bibitem{Eriksson2026KP}
+L.~Eriksson,
+\emph{Closing the Last Gap in the 4D $SU(N)$ Yang--Mills Construction: A
+Verified Terminal KP Bound and an Explicit Clay Checklist},
+ai.viXra:2602.0091, 2026.
+
+\bibitem{Eriksson2026Audit}
+L.~Eriksson,
+\emph{Mechanical Audit Experiments and Reproducibility Appendix for a
+Companion-Paper Programme on 4D $SU(N)$ Yang--Mills Existence and Mass Gap},
+ai.viXra:2602.0117, 2026.
+
+\bibitem{Repo}
+L.~Eriksson,
+\emph{rooted-tree-catalan-closure} (challenge repository),
+\url{https://github.com/lluiseriksson/rooted-tree-catalan-closure},
+pull request \#5, commit \texttt{1eff8fc6}, CI run 28610948452, 2026.
+
+\end{thebibliography}
+
+\end{document}

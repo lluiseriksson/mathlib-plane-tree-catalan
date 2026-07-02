@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this Mathlib contribution kit or the accompanying paper, please cite it as below."
+title: "mathlib-plane-tree-catalan: plane trees counted by Catalan numbers"
+authors:
+  - family-names: Eriksson
+    given-names: Lluis
+date-released: "2026-07-02"
+repository-code: "https://github.com/lluiseriksson/mathlib-plane-tree-catalan"
+license: Apache-2.0
+keywords:
+  - Lean 4
+  - Mathlib
+  - Catalan numbers
+  - plane trees
+  - formal verification
+preferred-citation:
+  type: article
+  title: "A Machine-Verified Bijective Proof of the Rooted Child-Factorial Catalan Identity over Spanning Trees of the Complete Graph"
+  authors:
+    - family-names: Eriksson
+      given-names: Lluis
+  year: 2026

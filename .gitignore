@@ -1,0 +1,14 @@
+.lake/
+build/
+lake-packages/
+.DS_Store
+Thumbs.db
+*.olean
+*.ilean
+*.trace
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.toc
