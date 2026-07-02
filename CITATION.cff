@@ -6,6 +6,10 @@ authors:
     given-names: Lluis
 date-released: "2026-07-02"
 repository-code: "https://github.com/lluiseriksson/mathlib-plane-tree-catalan"
+identifiers:
+  - type: url
+    value: "https://ai.vixra.org/abs/2607.0001"
+    description: "Preprint (ai.viXra:2607.0001)"
 license: Apache-2.0
 keywords:
   - Lean 4
@@ -20,3 +24,4 @@ preferred-citation:
     - family-names: Eriksson
       given-names: Lluis
   year: 2026
+  url: "https://ai.vixra.org/abs/2607.0001"
