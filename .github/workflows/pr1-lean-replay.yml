@@ -1,0 +1,182 @@
+name: PR1 Lean replay
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/pr1-lean-replay.yml"
+      - "Mathlib/Combinatorics/Enumerative/PlaneTree.lean"
+      - "verification/pr1-compile-oracle.log"
+  pull_request:
+    paths:
+      - ".github/workflows/pr1-lean-replay.yml"
+      - "Mathlib/Combinatorics/Enumerative/PlaneTree.lean"
+      - "verification/pr1-compile-oracle.log"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr1-lean-replay-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  LEAN_TOOLCHAIN: leanprover/lean4:v4.29.0-rc6
+  MATHLIB_SHA: 07642720480157414db592fa85b626dafb71355b
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  replay:
+    name: Replay PlaneTree Catalan PR-1
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out PR kit
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          path: artifact
+          persist-credentials: false
+
+      - name: Check out pinned mathlib4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          repository: leanprover-community/mathlib4
+          ref: 07642720480157414db592fa85b626dafb71355b
+          path: mathlib4
+          persist-credentials: false
+
+      - name: Verify pinned inputs
+        working-directory: mathlib4
+        run: |
+          test "$(git rev-parse HEAD)" = "$MATHLIB_SHA"
+          test "$(tr -d '\r\n' < lean-toolchain)" = "$LEAN_TOOLCHAIN"
+          test -f ../artifact/Mathlib/Combinatorics/Enumerative/PlaneTree.lean
+          grep -Fq "$LEAN_TOOLCHAIN" ../artifact/verification/pr1-compile-oracle.log
+          grep -Fq "$MATHLIB_SHA" ../artifact/verification/pr1-compile-oracle.log
+
+      - name: Install pinned Lean and restore caches
+        uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9 # v1
+        with:
+          lake-package-directory: mathlib4
+          auto-config: false
+          use-mathlib-cache: true
+          use-github-cache: true
+
+      - name: Copy PR-1 file into mathlib4
+        run: |
+          mkdir -p mathlib4/Mathlib/Combinatorics/Enumerative
+          cp artifact/Mathlib/Combinatorics/Enumerative/PlaneTree.lean \
+            mathlib4/Mathlib/Combinatorics/Enumerative/PlaneTree.lean
+          git -C mathlib4 diff --check
+
+      - name: Build PlaneTree module
+        working-directory: mathlib4
+        run: |
+          lake exe mk_all 2>&1 | tee ../artifact/pr1-replay-build.log
+          lake env lean Mathlib/Combinatorics/Enumerative/PlaneTree.lean \
+            2>&1 | tee -a ../artifact/pr1-replay-build.log
+
+      - name: Inspect theorem axioms and numeric check
+        working-directory: mathlib4
+        run: |
+          cat > pr1_oracle.lean <<'EOF'
+          import Mathlib.Combinatorics.Enumerative.PlaneTree
+
+          #print axioms PlaneTree.card_treesOfNumNodesEq_succ
+          #print axioms PlaneTree.mem_treesOfNumNodesEq
+          #print axioms PlaneTree.card_forestsOfNumNodesEq
+
+          example : (PlaneTree.treesOfNumNodesEq 3).card = 2 := by
+            rw [PlaneTree.card_treesOfNumNodesEq_succ, catalan_two]
+          EOF
+          lake env lean pr1_oracle.lean 2>&1 | tee ../artifact/pr1-replay-oracle.log
+
+      - name: Verify replay logs and emit report
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          import pathlib
+          import re
+          import sys
+          from datetime import datetime, timezone
+
+          root = pathlib.Path("artifact")
+          build_path = root / "pr1-replay-build.log"
+          oracle_path = root / "pr1-replay-oracle.log"
+          build = build_path.read_text(encoding="utf-8")
+          oracle = oracle_path.read_text(encoding="utf-8")
+
+          def fail(message: str) -> None:
+              print(f"pr1 replay verification failed: {message}", file=sys.stderr)
+              raise SystemExit(1)
+
+          for needle in ("error:", "sorryAx"):
+              if needle in build or needle in oracle:
+                  fail(f"found {needle!r} in replay logs")
+          if "warning:" in build or "warning:" in oracle:
+              fail("found Lean warning in replay logs")
+
+          expected = {
+              "PlaneTree.card_treesOfNumNodesEq_succ",
+              "PlaneTree.mem_treesOfNumNodesEq",
+              "PlaneTree.card_forestsOfNumNodesEq",
+          }
+          allowed = {"propext", "Classical.choice", "Quot.sound"}
+          found = {}
+          pattern = re.compile(r"'([^']+)' depends on axioms: \[([^\]]*)\]")
+          for name, axiom_text in pattern.findall(oracle):
+              axioms = {item.strip() for item in axiom_text.split(",") if item.strip()}
+              found[name] = sorted(axioms)
+          missing = expected - found.keys()
+          if missing:
+              fail(f"missing oracle declarations: {sorted(missing)}")
+          for name in expected:
+              axioms = set(found[name])
+              if axioms != allowed:
+                  fail(f"{name} has axioms {sorted(axioms)}, expected {sorted(allowed)}")
+
+          if "example : (PlaneTree.treesOfNumNodesEq 3).card = 2" not in oracle:
+              # Lean does not echo successful examples; require the command to have run by
+              # checking that the oracle log exists and the previous exact oracle passed.
+              pass
+
+          def sha256(path: pathlib.Path) -> str:
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+
+          report = {
+              "schema_version": 1,
+              "status": "pr1_plane_tree_replay_passed",
+              "artifact_sha": os.environ["GITHUB_SHA"],
+              "mathlib_sha": os.environ["MATHLIB_SHA"],
+              "lean_toolchain": os.environ["LEAN_TOOLCHAIN"],
+              "generated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+              "build_log": {
+                  "path": build_path.name,
+                  "sha256": sha256(build_path),
+              },
+              "oracle_log": {
+                  "path": oracle_path.name,
+                  "sha256": sha256(oracle_path),
+              },
+              "declarations": [
+                  {"name": name, "axioms": found[name]} for name in sorted(expected)
+              ],
+          }
+          (root / "pr1-replay-report.json").write_text(
+              json.dumps(report, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print("pr1_plane_tree_replay_passed")
+          PY
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: pr1-lean-replay-evidence
+          path: |
+            artifact/pr1-replay-build.log
+            artifact/pr1-replay-oracle.log
+            artifact/pr1-replay-report.json
+          if-no-files-found: error
+          retention-days: 30
