@@ -72,13 +72,15 @@ jobs:
       - name: Build PlaneTree module
         working-directory: mathlib4
         run: |
+          set -o pipefail
           lake exe mk_all 2>&1 | tee ../artifact/pr1-replay-build.log
-          lake env lean Mathlib/Combinatorics/Enumerative/PlaneTree.lean \
+          lake build Mathlib.Combinatorics.Enumerative.PlaneTree \
             2>&1 | tee -a ../artifact/pr1-replay-build.log
 
       - name: Inspect theorem axioms and numeric check
         working-directory: mathlib4
         run: |
+          set -o pipefail
           cat > pr1_oracle.lean <<'EOF'
           import Mathlib.Combinatorics.Enumerative.PlaneTree
 
