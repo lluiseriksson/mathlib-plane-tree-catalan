@@ -68,8 +68,8 @@ linear ordering of every child set are placed in explicit bijection with
 vertex-labeled plane trees on $n+1$ nodes whose root carries the label $0$.
 The identity arises as the exact ``second-Ursell'' normalization constant in
 the author's audit-first programme on four-dimensional $SU(N)$ Yang--Mills
-existence and mass gap, where it had been isolated as a named open proposition
-in a public challenge repository; the present paper is self-contained
+existence and mass gap, where it had been isolated as an explicitly
+open, named proposition in a public repository; the present paper is self-contained
 combinatorics and makes no claim about that programme.  The entire proof has
 been formalized in Lean~4 against a pinned Mathlib snapshot: the headline
 declarations compile with no \texttt{sorry}, and the kernel's axiom oracle
@@ -97,10 +97,10 @@ constant of the expansion is precisely the ratio of the weighted sum to
 $(n+1)!/(n+1) = n!$, and convergence at the stated radius needs this ratio to
 be the Catalan number $C_n$ on the nose, not merely of Catalan order.  The
 statement was therefore isolated, under the name
-\texttt{RootedChildFactorialCatalanIdentity}, as an explicitly open
-proposition in a public challenge repository, with the request that it be
-closed by an unconditional, machine-checked proof against the repository's own
-definitions.
+\texttt{RootedChildFactorialCatalanIdentity}, as an explicitly open, named
+proposition in a public repository, so that downstream theorems could assume
+it honestly until an unconditional, machine-checked proof against the
+repository's own definitions was supplied.  This paper supplies that proof.
 
 This paper does three things.
 \begin{enumerate}
@@ -112,11 +112,11 @@ This paper does three things.
     (Section~\ref{sec:counting}).
   \item It reports a complete formalization of the proof in
     Lean~4~\cite{Lean4} over the Mathlib library~\cite{mathlib}, carried out
-    against the pinned toolchain of the challenge repository and checked by
+    against the pinned toolchain of the repository and checked by
     the Lean kernel with a clean axiom footprint
     (Section~\ref{sec:lean}).
   \item It documents the reproducibility artifacts: the repository, the
-    pull request closing the challenge, the exact commit, and a pinned
+    closing pull request, the exact commit, and a pinned
     continuous-integration replay of the entire verification
     (Section~\ref{sec:repro}).
 \end{enumerate}
@@ -159,8 +159,7 @@ For every $n \ge 1$,
   \;=\; C_n
 \]
 as an identity of real numbers.  This is the form
-\emph{\texttt{RootedChildFactorialCatalanIdentity}} of the challenge
-repository.
+\emph{\texttt{RootedChildFactorialCatalanIdentity}} of the repository.
 \end{corollary}
 
 \begin{remark}
@@ -380,7 +379,7 @@ $(n+1)! = (n+1)\,n!$ and $n! \neq 0$.
 \section{The Lean formalization}\label{sec:lean}
 
 Every statement above has been formalized in Lean~4~\cite{Lean4} over
-Mathlib~\cite{mathlib}, against the challenge repository's pinned toolchain
+Mathlib~\cite{mathlib}, against the repository's pinned toolchain
 (Lean \texttt{leanprover/lean4:v4.29.0-rc6}, Mathlib commit
 \texttt{07642720480157414db592fa85b626dafb71355b}) and against the
 repository's \emph{own} definitions of spanning trees, breadth-first-search
@@ -468,7 +467,7 @@ A few engineering points may be of independent interest to formalizers.
 
 \section{Reproducibility and artifacts}\label{sec:repro}
 
-All artifacts are public in the challenge repository
+All artifacts are public in the repository
 \begin{center}
 \url{https://github.com/lluiseriksson/rooted-tree-catalan-closure}
 \end{center}
@@ -587,7 +586,7 @@ ai.viXra:2602.0117, 2026.
 
 \bibitem{Repo}
 L.~Eriksson,
-\emph{rooted-tree-catalan-closure} (challenge repository),
+\emph{rooted-tree-catalan-closure} (artifact repository),
 \url{https://github.com/lluiseriksson/rooted-tree-catalan-closure},
 pull request \#5, commit \texttt{1eff8fc6}, CI run 28610948452, 2026.
 

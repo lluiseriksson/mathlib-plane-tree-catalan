@@ -6,10 +6,10 @@
   limpio, test numérico OK (`pr1-compile-oracle.log`).
 - `PR1_DESCRIPTION.md` — título + descripción del PR listos para pegar +
   checklist del proceso Mathlib (acceso push vía #new members, `mk_all`, etc.).
-- `ZULIP_POST.md` — el post en inglés para #maths: anuncia el cierre del
-  desafío (con PR #5, replay y paper) y propone la escalera de PRs — la
-  pregunta de diseño del PR-4a incluida (es la que genera la conversación
-  con mantenedores que buscaba la idea 2).
+- `ZULIP_POST.md` — el post en inglés para #maths: presenta la proposición
+  abierta ya cerrada en Lean y propone la escalera de PRs — la pregunta de
+  diseño del PR-4a incluida (es la que genera la conversación con
+  mantenedores que buscaba la idea 2).
 - `MATHLIB_PR_LADDER.md` — la escalera completa PR-1…PR-4b con fuentes en
   el repo y notas de proceso.
 - `paper/paper.pdf` + `paper/paper.tex` — el paper, incluido junto como
