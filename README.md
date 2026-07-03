@@ -21,6 +21,7 @@ trees, and proves that plane trees with `n + 1` nodes are counted by
 
 Prepared Mathlib PR:
 
+- Current digest: [`STATUS.md`](STATUS.md)
 - Title/description: [`docs/PR1_DESCRIPTION.md`](docs/PR1_DESCRIPTION.md)
 - Compile/oracle log: [`verification/pr1-compile-oracle.log`](verification/pr1-compile-oracle.log)
 - Proposed Zulip post: [`docs/ZULIP_POST.md`](docs/ZULIP_POST.md)
