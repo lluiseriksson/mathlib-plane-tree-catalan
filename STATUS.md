@@ -1,6 +1,6 @@
 # Status digest
 
-Last checked: 2026-07-04 04:07 UTC.
+Last checked: 2026-07-04 05:09 UTC.
 
 Repository HEAD:
 
@@ -11,11 +11,15 @@ Repository HEAD:
 - Active satellite PR: #1
   <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/pull/1>
 - PR branch: `codex/hourly-status-digest-20260703-2200`
+- PR branch head before this audit:
+  `b9db7810a1b40284f71852cd6949a4a9d16630e3`
 - Replay evidence recorded before this digest update: `PR1 Lean replay` passed on
   `df128f7cd8ae425c982025cc6d7e949d43e370d5` at
   <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28688733179>
 - Open `agent-task`, `blocked`, or `interface-change` issues: none at the time
   of this digest.
+- Local PR diff check for this documentation-only update: `git diff --check
+  origin/main...HEAD` passed.
 
 ## PR-1 consumable surface
 
