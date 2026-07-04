@@ -1,11 +1,11 @@
 # Status digest
 
-Last checked: 2026-07-04 19:29 UTC.
+Last checked: 2026-07-04 21:42 UTC.
 
 Repository HEAD:
 
 - Branch: `main`
-- Commit: `389a24f83f785b75eba511c127fa7059ac90da83`
+- Commit: `653969081e316ca52379800515d418001d844274`
 - PR #1 status: merged into `main` as
   `24aa3bb0669b6b2c139fd394fa2b0dd3dbefa401`
   (<https://github.com/lluiseriksson/mathlib-plane-tree-catalan/pull/1>)
@@ -27,10 +27,22 @@ Repository HEAD:
 - PR #7 status: merged into `main` as
   `389a24f83f785b75eba511c127fa7059ac90da83`
   (<https://github.com/lluiseriksson/mathlib-plane-tree-catalan/pull/7>)
+- PR #8 status: merged into `main` as
+  `653969081e316ca52379800515d418001d844274`
+  (<https://github.com/lluiseriksson/mathlib-plane-tree-catalan/pull/8>)
 - Latest default-branch heartbeat: `PR1 Lean replay` passed on
-  `389a24f83f785b75eba511c127fa7059ac90da83` at
-  <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28717129718>
-- Open PRs: none at the time of this digest.
+  `653969081e316ca52379800515d418001d844274` at
+  <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28718958630>
+- Open PR: draft PR #9, `[codex] docs: refresh main heartbeat status`, branch
+  `codex/hourly-main-heartbeat-20260704-2038`, currently one documentation
+  commit past `main`
+  (`8dd7b85b4ed7c2fa86bd1630b481b222ebafcfd9`).
+- Latest PR #9 Lean replay before this documentation-only STATUS refresh
+  passed on
+  `dbde895d786f6e09b21e563d539f3c64334fb590` at
+  <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28719029477>.
+  The current head only changes `STATUS.md`, which is outside the replay
+  workflow path filter.
 - Open `agent-task`, `blocked`, or `interface-change` issues: none at the time
   of this digest.
 - Local no-placeholder check for the Lean module found no `sorry`, `axiom`, or
