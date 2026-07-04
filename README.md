@@ -23,6 +23,7 @@ Prepared Mathlib PR:
 
 - Current digest: [`STATUS.md`](STATUS.md)
 - Title/description: [`docs/PR1_DESCRIPTION.md`](docs/PR1_DESCRIPTION.md)
+- Port checklist: [`docs/PR1_MATHLIB_PORT_CHECKLIST.md`](docs/PR1_MATHLIB_PORT_CHECKLIST.md)
 - Compile/oracle log: [`verification/pr1-compile-oracle.log`](verification/pr1-compile-oracle.log)
 - Proposed Zulip post: [`docs/ZULIP_POST.md`](docs/ZULIP_POST.md)
 - Contribution ladder: [`docs/MATHLIB_PR_LADDER.md`](docs/MATHLIB_PR_LADDER.md)

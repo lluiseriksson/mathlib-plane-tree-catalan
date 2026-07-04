@@ -1,14 +1,17 @@
 # Status digest
 
-Last checked: 2026-07-04 10:26 UTC.
+Last checked: 2026-07-04 11:37 UTC.
 
 Repository HEAD:
 
 - Branch: `main`
-- Commit: `24aa3bb0669b6b2c139fd394fa2b0dd3dbefa401`
+- Commit: `35fe1b467436696e590a8344ed8c77b94f7432ad`
 - PR #1 status: merged into `main` as
   `24aa3bb0669b6b2c139fd394fa2b0dd3dbefa401`
   (<https://github.com/lluiseriksson/mathlib-plane-tree-catalan/pull/1>)
+- PR #2 status: merged into `main` as
+  `35fe1b467436696e590a8344ed8c77b94f7432ad`
+  (<https://github.com/lluiseriksson/mathlib-plane-tree-catalan/pull/2>)
 - Latest default-branch heartbeat: `PR1 Lean replay` passed on
   `24aa3bb0669b6b2c139fd394fa2b0dd3dbefa401` at
   <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28703251750>
@@ -88,6 +91,8 @@ Immediate consumer:
 - Open the first Mathlib PR from `docs/PR1_DESCRIPTION.md` after copying
   `Mathlib/Combinatorics/Enumerative/PlaneTree.lean` into a current Mathlib
   checkout and running `lake exe mk_all`.
+- Use `docs/PR1_MATHLIB_PORT_CHECKLIST.md` as the exact port checklist for
+  commands, public surface, and replay/oracle acceptance criteria.
 
 Downstream repo handoff:
 
