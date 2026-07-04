@@ -1,26 +1,23 @@
 # Status digest
 
-Last checked: 2026-07-04 06:53 UTC.
+Last checked: 2026-07-04 10:26 UTC.
 
 Repository HEAD:
 
 - Branch: `main`
-- Commit: `77adbc66fc7bcaae062fcd6c982fb3f580852775`
-- Latest default-branch CI: `PR1 Lean replay` passed at
-  <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28626403573>
-- Active satellite PR: #1
-  <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/pull/1>
-- PR branch: `codex/hourly-status-digest-20260703-2200`
-- PR branch head before this audit:
-  `d12415d8bdfe8cf5f7f4b1085b527bc98ef064c6`
-- Replay evidence recorded before this digest update: `PR1 Lean replay` passed on
-  `d12415d8bdfe8cf5f7f4b1085b527bc98ef064c6` at
-  <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28695829444>
-- PR check rollup: no checks were reported on the PR branch by
-  `gh pr checks 1`, so this audit does not merge PR #1.
+- Commit: `24aa3bb0669b6b2c139fd394fa2b0dd3dbefa401`
+- PR #1 status: merged into `main` as
+  `24aa3bb0669b6b2c139fd394fa2b0dd3dbefa401`
+  (<https://github.com/lluiseriksson/mathlib-plane-tree-catalan/pull/1>)
+- Latest default-branch heartbeat: `PR1 Lean replay` passed on
+  `24aa3bb0669b6b2c139fd394fa2b0dd3dbefa401` at
+  <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28703251750>
+- Open PRs: none at the time of this digest.
 - Open `agent-task`, `blocked`, or `interface-change` issues: none at the time
   of this digest.
-- Local PR diff check for this documentation-only update: `git diff --check
+- Local no-placeholder check for the Lean module found no `sorry`, `axiom`, or
+  `admit`.
+- Local diff check for this documentation-only heartbeat: `git diff --check
   origin/main...HEAD` passed.
 
 ## PR-1 consumable surface
@@ -88,7 +85,7 @@ Lean `error:`, `warning:`, or `sorryAx` marker.
 
 Immediate consumer:
 
-- Open Mathlib PR 1 from `docs/PR1_DESCRIPTION.md` after copying
+- Open the first Mathlib PR from `docs/PR1_DESCRIPTION.md` after copying
   `Mathlib/Combinatorics/Enumerative/PlaneTree.lean` into a current Mathlib
   checkout and running `lake exe mk_all`.
 
