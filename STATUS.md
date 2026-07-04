@@ -1,6 +1,6 @@
 # Status digest
 
-Last checked: 2026-07-03 20:58 UTC.
+Last checked: 2026-07-04 00:02 UTC.
 
 Repository HEAD:
 
@@ -8,7 +8,9 @@ Repository HEAD:
 - Commit: `77adbc66fc7bcaae062fcd6c982fb3f580852775`
 - Latest default-branch CI: `PR1 Lean replay` passed at
   <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28626403573>
-- Open PRs in this repository: none at the time of this digest.
+- Active satellite PR: #1
+  <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/pull/1>
+- PR branch: `codex/hourly-status-digest-20260703-2200`
 - Open `agent-task`, `blocked`, or `interface-change` issues: none at the time
   of this digest.
 
