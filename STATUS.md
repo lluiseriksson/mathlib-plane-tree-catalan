@@ -1,6 +1,6 @@
 # Status digest
 
-Last checked: 2026-07-04 21:42 UTC.
+Last checked: 2026-07-04 22:45 UTC.
 
 Repository HEAD:
 
@@ -34,14 +34,15 @@ Repository HEAD:
   `653969081e316ca52379800515d418001d844274` at
   <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28718958630>
 - Open PR: draft PR #9, `[codex] docs: refresh main heartbeat status`, branch
-  `codex/hourly-main-heartbeat-20260704-2038`, currently one documentation
-  commit past `main`
-  (`8dd7b85b4ed7c2fa86bd1630b481b222ebafcfd9`).
-- Latest PR #9 Lean replay before this documentation-only STATUS refresh
+  `codex/hourly-main-heartbeat-20260704-2038`, currently documentation-only
+  relative to `main`. This digest refresh was prepared from branch head
+  `6b24b8de768858fe1ce8f4c0e62cdb0a2d77bedf`; the resulting commit also
+  changes only `STATUS.md`.
+- Latest PR #9 Lean replay before these documentation-only STATUS refreshes
   passed on
   `dbde895d786f6e09b21e563d539f3c64334fb590` at
   <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28719029477>.
-  The current head only changes `STATUS.md`, which is outside the replay
+  The current PR diff only changes `STATUS.md`, which is outside the replay
   workflow path filter.
 - Open `agent-task`, `blocked`, or `interface-change` issues: none at the time
   of this digest.
