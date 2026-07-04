@@ -5,11 +5,13 @@ on:
   push:
     paths:
       - ".github/workflows/pr1-lean-replay.yml"
+      - "docs/PR1_MATHLIB_PORT_CHECKLIST.md"
       - "Mathlib/Combinatorics/Enumerative/PlaneTree.lean"
       - "verification/pr1-compile-oracle.log"
   pull_request:
     paths:
       - ".github/workflows/pr1-lean-replay.yml"
+      - "docs/PR1_MATHLIB_PORT_CHECKLIST.md"
       - "Mathlib/Combinatorics/Enumerative/PlaneTree.lean"
       - "verification/pr1-compile-oracle.log"
 
