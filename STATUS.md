@@ -35,12 +35,10 @@ Repository HEAD:
   <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28718958630>
 - Open PR: draft PR #9, `[codex] docs: refresh main heartbeat status`, branch
   `codex/hourly-main-heartbeat-20260704-2038`, currently documentation-only
-  relative to `main`. This digest refresh was prepared from branch head
-  `396104e0dd3a02c4463659adadd86febb84b8e65`; the resulting commit also
-  changes only `STATUS.md`.
-- Latest PR #9 Lean replay passed on PR head
-  `396104e0dd3a02c4463659adadd86febb84b8e65` at
-  <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28744156575>.
+  relative to `main`; all commits in the branch change only `STATUS.md`.
+- PR #9 replay evidence recorded during this audit: `PR1 Lean replay` passed
+  on branch head `c2e200aa5dd59dd5f37d0f99e6fe9f7894e807f0` at
+  <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28747793207>.
 - Open `agent-task`, `blocked`, or `interface-change` issues: none at the time
   of this digest.
 - Local no-placeholder check for the Lean module found no `sorry`, `axiom`, or
