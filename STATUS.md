@@ -1,6 +1,6 @@
 # Status digest
 
-Last checked: 2026-07-04 22:45 UTC.
+Last checked: 2026-07-05 08:09 UTC.
 
 Repository HEAD:
 
@@ -38,12 +38,11 @@ Repository HEAD:
   relative to `main`. This digest refresh was prepared from branch head
   `6b24b8de768858fe1ce8f4c0e62cdb0a2d77bedf`; the resulting commit also
   changes only `STATUS.md`.
-- Latest PR #9 Lean replay before these documentation-only STATUS refreshes
-  passed on
-  `dbde895d786f6e09b21e563d539f3c64334fb590` at
-  <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28719029477>.
-  The current PR diff only changes `STATUS.md`, which is outside the replay
-  workflow path filter.
+- Latest PR #9 Lean replay passed on replayed PR head
+  `e2be9a8f1dc75e08ea83fa0fe8c87bceece2c2bc` at
+  <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28731325498>.
+  The later digest-only commit also changes only `STATUS.md`, which is outside
+  the replay workflow path filter.
 - Open `agent-task`, `blocked`, or `interface-change` issues: none at the time
   of this digest.
 - Local no-placeholder check for the Lean module found no `sorry`, `axiom`, or
