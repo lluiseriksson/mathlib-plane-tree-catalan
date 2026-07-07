@@ -1,11 +1,11 @@
 # Status digest
 
-Last checked: 2026-07-06 18:45 UTC.
+Last checked: 2026-07-07 00:31 UTC.
 
 Repository HEAD:
 
 - Branch: `main`
-- Commit: `653969081e316ca52379800515d418001d844274`
+- Commit: `6366ac8f98a9cc5cf2c69939c269efde03f0c20a`
 - PR #1 status: merged into `main` as
   `24aa3bb0669b6b2c139fd394fa2b0dd3dbefa401`
   (<https://github.com/lluiseriksson/mathlib-plane-tree-catalan/pull/1>)
@@ -30,22 +30,19 @@ Repository HEAD:
 - PR #8 status: merged into `main` as
   `653969081e316ca52379800515d418001d844274`
   (<https://github.com/lluiseriksson/mathlib-plane-tree-catalan/pull/8>)
+- PR #9 status: merged into `main` as
+  `6366ac8f98a9cc5cf2c69939c269efde03f0c20a`
+  (<https://github.com/lluiseriksson/mathlib-plane-tree-catalan/pull/9>)
 - Latest default-branch heartbeat: `PR1 Lean replay` passed on
-  `653969081e316ca52379800515d418001d844274` at
-  <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28718958630>
-- Open PR: PR #9, `[codex] docs: refresh main heartbeat status`, branch
-  `codex/hourly-main-heartbeat-20260704-2038`, currently documentation-only
-  relative to `main`, ready for review and mergeable; all commits in the
-  branch change only `STATUS.md`.
-- PR #9 replay evidence recorded during this audit: `PR1 Lean replay` passed
-  on branch head `91c2107382a5480407926fe87c95bb077ae8e46f` at
-  <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28766125789>.
+  `6366ac8f98a9cc5cf2c69939c269efde03f0c20a` at
+  <https://github.com/lluiseriksson/mathlib-plane-tree-catalan/actions/runs/28832786688>
+- Open PRs: none at the time of this digest.
 - Open `agent-task`, `blocked`, or `interface-change` issues: none at the time
   of this digest.
 - Local no-placeholder check for the Lean module found no `sorry`, `axiom`, or
   `admit`.
-- Local diff check for this documentation-only heartbeat: `git diff --check
-  origin/main...HEAD` passed.
+- Local whitespace check for this repository checkout: `git diff --check`
+  passed.
 
 ## PR-1 consumable surface
 
