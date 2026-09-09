@@ -1,5 +1,8 @@
 # mathlib-plane-tree-catalan
 
+<!-- RESEARCH-UPDATE-2026-09-09 -->
+> **Research update · 9 September 2026:** [verified source cards, limits and next experiments](research/updates/2026-09-09.md) · [machine-readable dossier](research/updates/2026-09-09.json).
+
 This repository packages the first Mathlib-facing extraction from the closed
 rooted child-factorial Catalan identity project:
 
