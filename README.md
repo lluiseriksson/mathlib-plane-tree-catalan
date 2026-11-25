@@ -92,12 +92,12 @@ The Lean contribution is prepared for Mathlib and follows the Apache 2.0 header
 used in the file. The repository includes the Apache 2.0 license text.
 
 <!-- papers-index:start -->
-## Paper index (AIRR and ai.viXra)
+## Paper index (AIRR)
 
 This repository accompanies the following paper by Lluis Eriksson.
 AIRR status is the archive's own label for the record; it is not peer review.
 
-| Title | AIRR | ai.viXra | AIRR status |
-|---|---|---|---|
-| A Machine-Verified Bijective Proof of the Rooted Child-Factorial Catalan Identity over Spanning Trees of the Complete Graph | [ARR-2026-70YEZS0RW882CVNM](https://airr.science/papers/ARR-2026-70YEZS0RW882CVNM/) | [2607.0001](https://www.ai.vixra.org/abs/2607.0001) | archived |
+| Title | AIRR | AIRR status |
+|---|---|---|
+| A Machine-Verified Bijective Proof of the Rooted Child-Factorial Catalan Identity over Spanning Trees of the Complete Graph | [ARR-2026-70YEZS0RW882CVNM](https://airr.science/papers/ARR-2026-70YEZS0RW882CVNM/) | archived |
 <!-- papers-index:end -->
