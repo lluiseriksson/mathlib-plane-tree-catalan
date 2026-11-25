@@ -79,7 +79,7 @@ Title:
 > A Machine-Verified Bijective Proof of the Rooted Child-Factorial Catalan
 > Identity over Spanning Trees of the Complete Graph
 
-Preprint: [ai.viXra:2607.0001](https://ai.vixra.org/abs/2607.0001).
+Preprint: [ARR-2026-70YEZS0RW882CVNM](https://airr.science/papers/ARR-2026-70YEZS0RW882CVNM/).
 
 The original closure repository and PR are:
 
